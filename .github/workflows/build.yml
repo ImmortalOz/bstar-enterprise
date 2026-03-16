@@ -15,6 +15,13 @@ jobs:
         with:
           flutter-version: '3.27.0'
           channel: stable
+      - name: Scaffold android folder
+        run: |
+          flutter create --org com.bstarenterprises --project-name bstar_app /tmp/scaffold
+          cp -r /tmp/scaffold/android ./android
+          cp -r /tmp/scaffold/web ./web
+          cp -r /tmp/scaffold/test ./test
+      - run: mkdir -p lib
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4

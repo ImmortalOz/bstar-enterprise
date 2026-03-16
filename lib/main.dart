@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Color(0xFF2D0F5A)));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const BStarApp());
+}
+
+const Color kPurple = Color(0xFF2D0F5A);
+const Color kGold   = Color(0xFFC9A227);
+const String kWA    = 'https://wa.me/2349060394516?text=Hello%20B.%20Star%20Enterprise';
+
+Future<void> openWA() async {
+  final uri = Uri.parse(kWA);
+  if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 class BStarApp extends StatelessWidget {
@@ -17,133 +23,38 @@ class BStarApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'B. Star Enterprise',
     debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      colorScheme: const ColorScheme.dark(
-        primary: Color(0xFFC9A227),
-        secondary: Color(0xFF4A1A8A),
-        surface: Color(0xFF2D0F5A)),
-      useMaterial3: true,
-    ),
-    home: const SplashScreen(),
-  );
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-  @override
-  State<SplashScreen> createState() => _SplashState();
-}
-
-class _SplashState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _c;
-  late Animation<double> _a;
-
-  @override
-  void initState() {
-    super.initState();
-    _c = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400));
-    _a = CurvedAnimation(parent: _c, curve: Curves.easeIn);
-    _c.forward();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()));
-    });
-  }
-
-  @override
-  void dispose() { _c.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFF2D0F5A),
-    body: FadeTransition(
-      opacity: _a,
-      child: Center(child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 150, height: 150,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFFC9A227), width: 3),
-              color: const Color(0xFF4A1A8A)),
-            child: const Icon(Icons.star,
-              color: Color(0xFFC9A227), size: 80),
-          ),
-          const SizedBox(height: 30),
-          const Text('B. STAR ENTERPRISE',
-            style: TextStyle(
-              color: Color(0xFFC9A227),
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5)),
-          const SizedBox(height: 12),
-          const Text(
-            'Empowering a Skillful Generation\nfor Global Impact',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 13, height: 1.5)),
-          const SizedBox(height: 40),
-          const CircularProgressIndicator(
-            color: Color(0xFFC9A227), strokeWidth: 2.5),
-          const SizedBox(height: 40),
-          const Text('CAC Reg. No. 8726066',
-            style: TextStyle(
-              color: Colors.white30, fontSize: 10)),
-        ],
-      )),
-    ),
+    theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: kPurple), useMaterial3: true),
+    home: const HomeScreen(),
   );
 }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeState();
+  @override State<HomeScreen> createState() => _HomeState();
 }
-
 class _HomeState extends State<HomeScreen> {
   int _idx = 0;
-  final _pages = const [
-    ServicesPage(),
-    SchoolsPage(),
-    ContactPage()
-  ];
-
+  final _pages = const [ServicesPage(), SchoolsPage(), ContactPage()];
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFF0A0614),
     appBar: AppBar(
-      backgroundColor: const Color(0xFF2D0F5A),
-      title: const Row(children: [
-        Icon(Icons.star, color: Color(0xFFC9A227), size: 28),
-        SizedBox(width: 10),
-        Text('B. STAR ENTERPRISE',
-          style: TextStyle(
-            color: Color(0xFFC9A227),
-            fontSize: 14,
-            fontWeight: FontWeight.bold)),
-      ]),
+      backgroundColor: kPurple,
+      title: const Text('B. STAR ENTERPRISE',
+        style: TextStyle(color: kGold, fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 1)),
     ),
     body: _pages[_idx],
     bottomNavigationBar: BottomNavigationBar(
       currentIndex: _idx,
       onTap: (i) => setState(() => _idx = i),
-      backgroundColor: const Color(0xFF2D0F5A),
-      selectedItemColor: const Color(0xFFC9A227),
+      backgroundColor: kPurple,
+      selectedItemColor: kGold,
       unselectedItemColor: Colors.white54,
+      type: BottomNavigationBarType.fixed,
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.business), label: 'Services'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.school), label: 'Schools'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.phone), label: 'Contact'),
+        BottomNavigationBarItem(icon: Icon(Icons.business_center), label: 'Services'),
+        BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Schools'),
+        BottomNavigationBarItem(icon: Icon(Icons.contact_phone), label: 'Contact'),
       ],
     ),
   );
@@ -151,188 +62,105 @@ class _HomeState extends State<HomeScreen> {
 
 class ServicesPage extends StatelessWidget {
   const ServicesPage({super.key});
+  static const _divs = [
+    ['Culinary & Food Production','Baking · Beverages · Spices · Food Packaging',0xFF0A5C36],
+    ['Beauty & Cosmetology','Skincare · Perfume · Soap Making · Bead Making',0xFF4A1A8A],
+    ['AI & Digital Monetisation','AI Content · AI Video · Digital Skills · Freelancing',0xFF0D2B55],
+    ['ICT & Digital Systems','Network Design · Installation · Maintenance',0xFF0B6E6E],
+    ['Software & Web Applications','Web Dev · Mobile Apps · Hosting · Databases',0xFF2D0F5A],
+    ['General Merchandise','Consumer Goods · Cosmetics · Confectioneries',0xFF8B6914],
+  ];
   @override
-  Widget build(BuildContext context) =>
-    ListView(padding: const EdgeInsets.all(16), children: const [
-      _SCard('🍽️ Culinary & Food Production',
-        'Baking · Beverages · Spices · Packaging',
-        Color(0xFF0A5C36)),
-      _SCard('💄 Beauty & Cosmetology',
-        'Skincare · Perfume · Soap · Bead Making',
-        Color(0xFF4A1A8A)),
-      _SCard('🤖 AI & Digital Monetisation',
-        'AI Content · Video · Digital Skills',
-        Color(0xFF0D2B55)),
-      _SCard('💻 ICT & Digital Systems',
-        'Network · Installation · Maintenance',
-        Color(0xFF0B6E6E)),
-      _SCard('⚙️ Software & Web Apps',
-        'Web Dev · Mobile Apps · Hosting',
-        Color(0xFF7B0D1E)),
-      _SCard('🛒 General Merchandise',
-        'Consumer Goods · Cosmetics · Confectioneries',
-        Color(0xFFB84A00)),
-    ]);
-}
-
-class _SCard extends StatelessWidget {
-  final String title, sub;
-  final Color color;
-  const _SCard(this.title, this.sub, this.color);
-
-  @override
-  Widget build(BuildContext context) => Card(
-    color: color,
-    margin: const EdgeInsets.only(bottom: 12),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(
-        color: Color(0xFFC9A227), width: 1)),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(
-            color: Color(0xFFC9A227),
-            fontSize: 15,
-            fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Text(sub, style: const TextStyle(
-            color: Colors.white70, fontSize: 13)),
-        ])));
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(14),
+    children: _divs.map((d) => Card(
+      color: Color(d[2] as int),
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: kGold, width: .8)),
+      child: Padding(padding: const EdgeInsets.all(14), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(d[0] as String, style: const TextStyle(color: kGold, fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(d[1] as String, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        ])),
+    )).toList(),
+  );
 }
 
 class SchoolsPage extends StatelessWidget {
   const SchoolsPage({super.key});
+  static const _schools = [
+    ['B. Star Culinary & Food Production School', 0xFF0A5C36],
+    ['B. Star Beauty & Cosmetology School', 0xFF4A1A8A],
+    ['B. Star AI & Digital Monetisation School', 0xFF0D2B55],
+  ];
   @override
-  Widget build(BuildContext context) =>
-    ListView(padding: const EdgeInsets.all(16), children: const [
-      _School('01', 'B. Star Culinary & Food Production School',
-        ['Baking', 'Beverages Production',
-         'Spices Production', 'Food Packaging'],
-        Color(0xFF0A5C36)),
-      _School('02', 'B. Star Beauty & Cosmetology School',
-        ['Skincare Production', 'Cosmetology',
-         'Perfume Making', 'Soap Making', 'Bead Making'],
-        Color(0xFF4A1A8A)),
-      _School('03', 'B. Star AI & Digital School',
-        ['AI Content Creation', 'AI Video Creation',
-         'Digital Monetisation', 'Social Media Business'],
-        Color(0xFF0D2B55)),
-    ]);
-}
-
-class _School extends StatelessWidget {
-  final String num, name;
-  final List<String> items;
-  final Color c;
-  const _School(this.num, this.name, this.items, this.c);
-
-  @override
-  Widget build(BuildContext context) => Card(
-    color: c,
-    margin: const EdgeInsets.only(bottom: 16),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(14),
-      side: const BorderSide(
-        color: Color(0xFFC9A227), width: 1.5)),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(num, style: const TextStyle(
-            color: Color(0x44C9A227),
-            fontSize: 36,
-            fontWeight: FontWeight.w900)),
-          Text(name, style: const TextStyle(
-            color: Color(0xFFC9A227),
-            fontSize: 14,
-            fontWeight: FontWeight.bold)),
-          const SizedBox(height: 10),
-          ...items.map((i) => Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Row(children: [
-              const Icon(Icons.diamond_outlined,
-                color: Color(0x88C9A227), size: 12),
-              const SizedBox(width: 6),
-              Text(i, style: const TextStyle(
-                color: Colors.white70, fontSize: 13)),
-            ]))),
-        ])));
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(14),
+    children: [
+      ..._schools.map((s) => Card(
+        color: Color(s[1] as int),
+        margin: const EdgeInsets.only(bottom: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: kGold, width: 1)),
+        child: Padding(padding: const EdgeInsets.all(16),
+          child: Text(s[0] as String,
+            style: const TextStyle(color: kGold, fontSize: 14, fontWeight: FontWeight.bold, height: 1.4))),
+      )),
+      const SizedBox(height: 8),
+      ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366),
+          foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 13),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+        icon: const Icon(Icons.chat_bubble),
+        label: const Text('Enquire About Enrolment', style: TextStyle(fontWeight: FontWeight.w800)),
+        onPressed: openWA,
+      ),
+    ],
+  );
 }
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
   @override
-  Widget build(BuildContext context) =>
-    Center(child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120, height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFFC9A227), width: 3),
-              color: const Color(0xFF4A1A8A)),
-            child: const Icon(Icons.star,
-              color: Color(0xFFC9A227), size: 60)),
-          const SizedBox(height: 24),
-          const Text('B. STAR ENTERPRISE',
-            style: TextStyle(
-              color: Color(0xFFC9A227),
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5)),
-          const SizedBox(height: 8),
-          const Text(
-            'Empowering a Skillful Generation\nfor Global Impact',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 13, height: 1.5)),
-          const SizedBox(height: 24),
-          _CRow(Icons.location_on,
-            '6 Opp Solid Rock School, Lugbe, FCT, Abuja'),
-          _CRow(Icons.badge,
-            'CAC Reg. No. 8726066 · TIN: 33461291-0001'),
-          _CRow(Icons.phone, 'WhatsApp: 09060394516'),
-          const SizedBox(height: 28),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.chat,
-              color: Color(0xFF2D0F5A)),
-            label: const Text('Chat on WhatsApp',
-              style: TextStyle(
-                color: Color(0xFF2D0F5A),
-                fontWeight: FontWeight.bold,
-                fontSize: 16)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC9A227),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30))),
-          ),
-        ])));
+  Widget build(BuildContext context) => SingleChildScrollView(
+    padding: const EdgeInsets.all(20),
+    child: Column(children: [
+      const SizedBox(height: 20),
+      const Text('B. STAR ENTERPRISE', style: TextStyle(color: kGold,
+        fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+      const SizedBox(height: 8),
+      const Text('"Empowering a Skillful Generation for Global Impact"',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white60, fontSize: 12, fontStyle: FontStyle.italic, height: 1.5)),
+      const SizedBox(height: 24),
+      const _CRow(Icons.location_on, '6 Opp Solid Rock School, Police Sign Board, Lugbe, FCT Abuja'),
+      const _CRow(Icons.badge, 'CAC Reg. No. 8726066 · TIN: 33461291-0001'),
+      const SizedBox(height: 24),
+      SizedBox(width: double.infinity, child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366),
+          foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+        icon: const Icon(Icons.chat_bubble, size: 20),
+        label: const Text('Chat on WhatsApp: 09060394516',
+          style: TextStyle(fontWeight: FontWeight.w800)),
+        onPressed: openWA,
+      )),
+    ]),
+  );
 }
 
 class _CRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
+  final IconData icon; final String text;
   const _CRow(this.icon, this.text);
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(children: [
-      Icon(icon, color: const Color(0xFFC9A227), size: 18),
+    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Icon(icon, color: kGold, size: 18),
       const SizedBox(width: 10),
-      Expanded(child: Text(text,
-        style: const TextStyle(
-          color: Colors.white70, fontSize: 12))),
-    ]));
+      Expanded(child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.5))),
+    ]),
+  );
 }
