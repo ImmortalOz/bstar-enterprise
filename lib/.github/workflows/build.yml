@@ -1,0 +1,27 @@
+// ── ROOT build.gradle — Project Level ────────────────────────────────────────
+// B. Star Enterprise Android App
+// Package: com.bstarenterprises.app
+// Version: 1.0.0
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Android Gradle Plugin — use latest stable
+        classpath 'com.android.tools.build:gradle:8.3.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Clean task
+tasks.register('clean', Delete) {
+    delete rootProject.buildDir
+}
